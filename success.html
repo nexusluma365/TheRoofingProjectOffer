@@ -195,7 +195,7 @@
           downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Again';
         }, 1500);
       } catch (error) {
-        showStatus('Download failed. Make sure your Netlify get-download-link function and ROOFING_BLUEPRINT_DOWNLOAD_URL environment variable are set.');
+        showStatus('Download failed. Make sure your Netlify get-download-link function and R2 environment variables are set.');
         downloadBtn.disabled = false;
         downloadBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Try Download Again';
       }

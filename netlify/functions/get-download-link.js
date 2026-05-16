@@ -1,86 +1,38 @@
-const createStripe = require('stripe');
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-const headers = {
-  'Content-Type': 'application/json'
-};
-
-function getPaymentIntentId(clientSecret) {
-  if (!clientSecret || typeof clientSecret !== 'string') return null;
-  const match = clientSecret.match(/^(pi_[^_]+)_secret_/);
-  return match ? match[1] : null;
-}
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Missing STRIPE_SECRET_KEY environment variable.' })
-    };
-  }
-
-  const downloadUrl = process.env.ROOFING_BLUEPRINT_DOWNLOAD_URL || process.env.DOWNLOAD_URL;
-  if (!downloadUrl) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Missing ROOFING_BLUEPRINT_DOWNLOAD_URL environment variable.' })
-    };
-  }
-
+exports.handler = async () => {
   try {
-    const body = JSON.parse(event.body || '{}');
-    const paymentIntentId = getPaymentIntentId(body.clientSecret);
+    const client = new S3Client({
+      region: "auto",
+      endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+      },
+    });
 
-    if (!paymentIntentId) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Missing or invalid payment verification token.' })
-      };
-    }
+    const command = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET,
+      Key: process.env.R2_FILE_KEY,
+      ResponseContentDisposition: `attachment; filename="${process.env.R2_FILE_KEY}"`,
+    });
 
-    const stripe = createStripe(process.env.STRIPE_SECRET_KEY);
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-    if (!paymentIntent || paymentIntent.status !== 'succeeded') {
-      return {
-        statusCode: 403,
-        headers,
-        body: JSON.stringify({ error: 'Payment has not been verified as successful.' })
-      };
-    }
-
-    if (
-      paymentIntent.amount !== 9700 ||
-      paymentIntent.currency !== 'usd' ||
-      paymentIntent.metadata?.source !== 'roofing-blueprint-sales-page'
-    ) {
-      return {
-        statusCode: 403,
-        headers,
-        body: JSON.stringify({ error: 'Payment does not match this product.' })
-      };
-    }
+    const url = await getSignedUrl(client, command, {
+      expiresIn: 900,
+    });
 
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({ url: downloadUrl })
+      body: JSON.stringify({ url }),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({
+        error: "Could not create download link",
+        details: error.message,
+      }),
     };
   }
 };
