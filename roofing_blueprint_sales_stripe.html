@@ -52,7 +52,7 @@ body {
 }
 .page-shell { transition: filter .22s ease; }
 body.modal-open { overflow: hidden; }
-body.modal-open .page-shell { filter: blur(5px); }
+body.modal-open .page-shell { pointer-events: none; }
 
 /* ─────────────────────────────────
    LOGO BAR
@@ -507,19 +507,17 @@ body.modal-open .page-shell { filter: blur(5px); }
 .checkout-modal {
   position: fixed; inset: 0; z-index: 50;
   display: none; align-items: center; justify-content: center;
-  padding: 24px; background: rgba(0,0,0,0.52);
+  padding: 18px; background: rgba(0,0,0,0.58);
 }
 .checkout-modal.is-open { display: flex; }
 .checkout-panel {
   position: relative;
-  width: min(100%, 980px);
-  max-height: min(92vh, 760px);
+  width: min(100%, 520px);
+  max-height: min(92vh, 720px);
   overflow: auto;
   background: var(--white);
   border-radius: 8px;
-  box-shadow: 0 28px 80px rgba(0,0,0,0.38);
-  display: grid;
-  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  box-shadow: 0 18px 54px rgba(0,0,0,0.32);
 }
 .checkout-close {
   position: absolute; top: 12px; right: 12px;
@@ -529,42 +527,7 @@ body.modal-open .page-shell { filter: blur(5px); }
   display: flex; align-items: center; justify-content: center; z-index: 2;
 }
 .checkout-close:hover { background: rgba(0,0,0,0.14); }
-.checkout-product {
-  background: #1a1a1a;
-  padding: 36px 28px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center;
-  border-right: 1px solid #2a2a2a;
-}
-.checkout-product h3 {
-  font-family: var(--font-h);
-  font-size: 26px; line-height: 1.1;
-  text-transform: uppercase; letter-spacing: .03em;
-  margin-bottom: 18px; color: var(--white);
-}
-.checkout-product-icon {
-  font-size: 80px; color: var(--accent);
-  margin-bottom: 20px;
-  filter: drop-shadow(0 4px 20px rgba(232,93,4,0.4));
-}
-.checkout-product-items {
-  list-style: none; display: flex; flex-direction: column; gap: 6px;
-  text-align: left; width: 100%;
-}
-.checkout-product-items li {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: #aaa;
-  padding: 5px 8px; background: rgba(255,255,255,0.04);
-  border-radius: 5px; border: 1px solid rgba(255,255,255,0.06);
-}
-.checkout-product-items li i { color: var(--accent); font-size: 11px; }
-.checkout-product-price {
-  margin-top: 18px;
-  font-family: var(--font-h); font-size: 30px; font-weight: 700;
-  color: var(--accent);
-}
-.checkout-form-wrap { padding: 42px 34px 34px; }
+.checkout-form-wrap { padding: 36px 30px 30px; }
 .checkout-kicker {
   font-family: var(--font-h); font-size: 13px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .08em;
@@ -575,7 +538,34 @@ body.modal-open .page-shell { filter: blur(5px); }
   text-transform: uppercase; letter-spacing: .02em; margin-bottom: 8px;
 }
 .checkout-copy {
-  font-size: 14px; color: #555; line-height: 1.55; margin-bottom: 22px;
+  font-size: 14px; color: #555; line-height: 1.55; margin-bottom: 16px;
+}
+.checkout-summary {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 14px 16px; margin-bottom: 18px;
+  background: #111; color: var(--white);
+  border-radius: 7px;
+}
+.checkout-summary strong {
+  display: block;
+  font-family: var(--font-h);
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: 1.1;
+}
+.checkout-summary span {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: #aaa;
+}
+.checkout-total {
+  font-family: var(--font-h);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
 }
 .checkout-form { display: grid; gap: 12px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -597,15 +587,16 @@ body.modal-open .page-shell { filter: blur(5px); }
 .checkout-secure i { color: #4CAF50; }
 
 
-/* Stripe Payment Element */
+/* Stripe Card Element */
 .stripe-box {
   display: grid;
   gap: 12px;
 }
-#payment-element {
-  padding: 12px;
+#card-element {
+  min-height: 48px;
+  padding: 14px 12px;
   border: 1px solid #d4dce4;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
 }
 #payment-message {
@@ -669,9 +660,7 @@ body.modal-open .page-shell { filter: blur(5px); }
   }
   .fail-card-desc { max-width: none; }
   .checkout-modal { padding: 14px; align-items: flex-start; overflow: auto; }
-  .checkout-panel { grid-template-columns: 1fr; max-height: none; }
-  .checkout-product { padding: 30px 18px 24px; border-right: 0; border-bottom: 1px solid #2a2a2a; }
-  .checkout-product h3 { font-size: 22px; }
+  .checkout-panel { max-height: none; }
   .checkout-form-wrap { padding: 32px 18px 24px; }
   .checkout-form-wrap h3 { font-size: 28px; }
   .field-row { grid-template-columns: 1fr; }
@@ -685,8 +674,8 @@ body.modal-open .page-shell { filter: blur(5px); }
   .guarantee-strip { align-items: flex-start; justify-content: flex-start; padding: 18px; }
   .checkout-modal { padding: 8px; }
   .checkout-close { top: 8px; right: 8px; background: rgba(255,255,255,0.86); }
-  .checkout-product-icon { font-size: 56px; margin-bottom: 12px; }
-  .checkout-product-price { font-size: 24px; }
+  .checkout-summary { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .checkout-total { font-size: 26px; }
 }
 </style>
 <script src="https://js.stripe.com/v3/"></script>
@@ -1017,43 +1006,33 @@ body.modal-open .page-shell { filter: blur(5px); }
       <i class="fa-solid fa-xmark"></i>
     </button>
 
-    <div class="checkout-product">
-      <h3>Your Roofing Business Blueprint™</h3>
-      <i class="fa-solid fa-house-chimney checkout-product-icon"></i>
-      <ul class="checkout-product-items">
-        <li><i class="fa-solid fa-check"></i> Roofing Sales Script</li>
-        <li><i class="fa-solid fa-check"></i> Door Knocking Playbook</li>
-        <li><i class="fa-solid fa-check"></i> Objection Cheat Sheet</li>
-        <li><i class="fa-solid fa-check"></i> Roofing Lead System</li>
-        <li><i class="fa-solid fa-check"></i> First $10K Roofing Plan</li>
-        <li><i class="fa-solid fa-check"></i> Pricing &amp; Estimate Guide</li>
-        <li><i class="fa-solid fa-check"></i> Follow-Up Templates</li>
-        <li><i class="fa-solid fa-check"></i> Business Starter Checklist</li>
-        <li><i class="fa-solid fa-star"></i> BONUS: Mindset Training</li>
-        <li><i class="fa-solid fa-star"></i> BONUS: AI Lead System</li>
-      </ul>
-      <div class="checkout-product-price">Purchase Today For Only $97</div>
-    </div>
-
     <div class="checkout-form-wrap">
       <div class="checkout-kicker">Secure Checkout</div>
       <h3 id="checkoutTitle">Complete Your Order</h3>
-      <p class="checkout-copy">Enter your payment information below to unlock instant access to The Roofing Business Blueprint™ and all bonuses.</p>
+      <p class="checkout-copy">Enter the minimum payment details below. Access opens immediately after payment.</p>
+
+      <div class="checkout-summary" aria-label="Order summary">
+        <div>
+          <strong>Roofing Blueprint Kit</strong>
+          <span>Instant digital access</span>
+        </div>
+        <div class="checkout-total">$97</div>
+      </div>
 
       <form class="checkout-form" id="payment-form">
-        <label>
-          Email Address
-          <input type="email" id="customer-email" name="email" autocomplete="email" placeholder="you@example.com" required>
-        </label>
-
         <label>
           Full Name
           <input type="text" id="customer-name" name="name" autocomplete="name" placeholder="Full name" required>
         </label>
 
+        <label>
+          Email Address
+          <input type="email" id="customer-email" name="email" autocomplete="email" placeholder="you@example.com" required>
+        </label>
+
         <div class="stripe-box">
-          <label for="payment-element">Payment Information</label>
-          <div id="payment-element"></div>
+          <label for="card-element">Card Information</label>
+          <div id="card-element"></div>
           <div id="payment-message" role="alert"></div>
         </div>
 
@@ -1104,6 +1083,7 @@ body.modal-open .page-shell { filter: blur(5px); }
   const nameInput = document.querySelector('#customer-name');
   const submitButton = document.querySelector('#submit-payment');
   const paymentMessage = document.querySelector('#payment-message');
+  const heroVideo = document.getElementById('roofing-sales-video');
 
   // Replace this with your real Stripe publishable key from Stripe Dashboard.
   // Example: pk_live_xxxxxxxxx or pk_test_xxxxxxxxx
@@ -1111,7 +1091,9 @@ body.modal-open .page-shell { filter: blur(5px); }
 
   let stripe;
   let elements;
-  let paymentElementMounted = false;
+  let cardElement;
+  let clientSecret;
+  let cardElementMounted = false;
 
   function showMessage(message) {
     paymentMessage.textContent = message;
@@ -1124,14 +1106,37 @@ body.modal-open .page-shell { filter: blur(5px); }
   }
 
   async function initializeStripeCheckout() {
-    if (paymentElementMounted) return;
+    if (cardElementMounted) return;
 
     if (!STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY.includes('REPLACE_WITH')) {
       showMessage('Add your Stripe publishable key in this HTML file before going live.');
       return;
     }
 
-    stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+    stripe = stripe || Stripe(STRIPE_PUBLISHABLE_KEY);
+    elements = elements || stripe.elements({
+      fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap' }]
+    });
+
+    cardElement = elements.create('card', {
+      hidePostalCode: false,
+      style: {
+        base: {
+          color: '#1A1A1A',
+          fontFamily: 'Open Sans, Arial, sans-serif',
+          fontSize: '15px',
+          fontWeight: '600',
+          '::placeholder': { color: '#8a96a3' }
+        },
+        invalid: {
+          color: '#9c3a00',
+          iconColor: '#E85D04'
+        }
+      }
+    });
+
+    cardElement.mount('#card-element');
+    cardElementMounted = true;
 
     const response = await fetch('/.netlify/functions/create-payment-intent', {
       method: 'POST',
@@ -1150,32 +1155,16 @@ body.modal-open .page-shell { filter: blur(5px); }
       return;
     }
 
-    elements = stripe.elements({
-      clientSecret: data.clientSecret,
-      appearance: {
-        theme: 'stripe',
-        variables: {
-          colorPrimary: '#E85D04',
-          borderRadius: '6px',
-          fontFamily: 'Open Sans, Arial, sans-serif'
-        }
-      }
-    });
-
-    const paymentElement = elements.create('payment', {
-      layout: 'tabs'
-    });
-
-    paymentElement.mount('#payment-element');
-    paymentElementMounted = true;
+    clientSecret = data.clientSecret;
   }
 
   function openCheckout(event) {
     if (event) event.preventDefault();
+    heroVideo?.pause();
     checkoutModal.classList.add('is-open');
     checkoutModal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('modal-open');
-    emailInput?.focus();
+    nameInput?.focus();
     initializeStripeCheckout().catch(() => {
       showMessage('Unable to load Stripe checkout. Check your Netlify function and Stripe keys.');
     });
@@ -1185,6 +1174,7 @@ body.modal-open .page-shell { filter: blur(5px); }
     checkoutModal.classList.remove('is-open');
     checkoutModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('modal-open');
+    heroVideo?.play().catch(() => {});
   }
 
   checkoutTriggers.forEach((trigger) => {
@@ -1203,7 +1193,7 @@ body.modal-open .page-shell { filter: blur(5px); }
     event.preventDefault();
     clearMessage();
 
-    if (!stripe || !elements) {
+    if (!stripe || !cardElement || !clientSecret) {
       showMessage('Stripe checkout is still loading. Please try again in a moment.');
       return;
     }
@@ -1211,17 +1201,14 @@ body.modal-open .page-shell { filter: blur(5px); }
     submitButton.disabled = true;
     submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Secure Payment...';
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        receipt_email: emailInput.value,
-        payment_method_data: {
-          billing_details: {
-            name: nameInput.value,
-            email: emailInput.value
-          }
-        },
-        return_url: `${window.location.origin}/success.html`
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      receipt_email: emailInput.value,
+      payment_method: {
+        card: cardElement,
+        billing_details: {
+          name: nameInput.value,
+          email: emailInput.value
+        }
       }
     });
 
@@ -1229,7 +1216,17 @@ body.modal-open .page-shell { filter: blur(5px); }
       showMessage(error.message || 'Payment failed. Please check your details and try again.');
       submitButton.disabled = false;
       submitButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay $97 Now — Get Instant Access';
+      return;
     }
+
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      window.location.href = `${window.location.origin}/success.html?payment_intent_client_secret=${encodeURIComponent(clientSecret)}`;
+      return;
+    }
+
+    showMessage('Payment is still processing. Please wait a moment and try again.');
+    submitButton.disabled = false;
+    submitButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay $97 Now — Get Instant Access';
   });
 </script>
 

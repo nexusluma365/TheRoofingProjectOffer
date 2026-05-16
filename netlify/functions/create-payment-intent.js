@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 9700,
       currency: 'usd',
-      automatic_payment_methods: { enabled: true },
+      payment_method_types: ['card'],
       description: 'The Roofing Business Blueprint',
       metadata: {
         product: body.product || 'The Roofing Business Blueprint',
