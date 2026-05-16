@@ -1,0 +1,14 @@
+/Roofing Business Video Sales.web.mp4
+  Cache-Control: public, max-age=31536000, immutable
+
+/Roofing Business Video Sales poster.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+/Product mockup.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/Prouduct mockup.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

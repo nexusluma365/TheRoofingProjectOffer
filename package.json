@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "netlify dev",
+    "deploy": "netlify deploy --prod --dir . --functions netlify/functions --no-build"
+  },
+  "dependencies": {
+    "stripe": "latest"
+  },
+  "devDependencies": {
+    "netlify-cli": "latest"
+  }
+}

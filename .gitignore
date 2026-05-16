@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Local Netlify files
+.netlify
+deno.lock
+
+# OS/editor files
+.DS_Store
+
+# Local source/backup files not used by deployed site
+Roofing Business Video Sales.mov
+roofing_blueprint_sales_stripe.html.bak

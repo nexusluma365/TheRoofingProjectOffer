@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Successful | Roofing Blueprint</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root { --accent:#E85D04; --accent-dark:#C44A02; --black:#111; --white:#fff; --ink:#1a1a1a; }
+    body {
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:radial-gradient(circle at top, #292929 0%, #111 48%, #070707 100%);
+      color:#fff;
+      font-family:'Open Sans', Arial, sans-serif;
+      padding:24px;
+    }
+    .card {
+      width:min(100%, 720px);
+      background:#fff;
+      color:var(--ink);
+      border-radius:16px;
+      padding:clamp(24px, 6vw, 42px);
+      text-align:center;
+      box-shadow:0 24px 80px rgba(0,0,0,.42);
+      border:1px solid rgba(232,93,4,.22);
+    }
+    .success-icon {
+      width:76px;
+      height:76px;
+      border-radius:999px;
+      background:rgba(232,93,4,.1);
+      color:var(--accent);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      margin-bottom:18px;
+    }
+    h1 {
+      font-family:'Oswald', sans-serif;
+      font-size:clamp(34px, 8vw, 48px);
+      line-height:1.08;
+      text-transform:uppercase;
+      margin:0 0 12px;
+      letter-spacing:.02em;
+    }
+    .accent { color:var(--accent); }
+    p { line-height:1.65; font-size:16px; margin:0 auto 16px; max-width:560px; color:#444; }
+    .status {
+      margin:18px auto;
+      padding:12px 14px;
+      border-radius:8px;
+      background:#fff5f0;
+      border:1px solid #f3c4a8;
+      color:#8d3500;
+      font-size:14px;
+      display:none;
+    }
+    .status.show { display:block; }
+    .download-btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      width:min(100%, 420px);
+      margin-top:12px;
+      background:linear-gradient(180deg, #F47835 0%, #C44A02 100%);
+      color:#fff;
+      text-decoration:none;
+      border:0;
+      padding:17px 22px;
+      border-radius:7px;
+      font-family:'Oswald', sans-serif;
+      font-size:20px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      line-height:1.2;
+      cursor:pointer;
+      box-shadow:0 10px 30px rgba(200,70,0,.34);
+    }
+    .download-btn:disabled { opacity:.65; cursor:not-allowed; }
+    .small { margin-top:14px; font-size:13px; color:#777; }
+    .back-link {
+      display:inline-block;
+      margin-top:22px;
+      color:#666;
+      text-decoration:none;
+      font-weight:700;
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+    <h1>Payment <span class="accent">Successful</span></h1>
+    <p id="main-copy">Your payment is being verified. Once confirmed, your secure download button will be ready below.</p>
+
+    <div id="status" class="status" role="alert"></div>
+
+    <button id="downloadBtn" class="download-btn" type="button" disabled>
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Verifying Payment...
+    </button>
+
+    <p class="small">Your download link is private and temporary. If it expires, refresh this page after purchase and click download again.</p>
+    <a class="back-link" href="/">← Back to sales page</a>
+  </main>
+
+  <script>
+    // Must match the publishable key used on your checkout page.
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51REXciCySCiHdPyyts0MmZgs87FbnLYUjF91PvwD4XWyL1SE1g7pkC5cxSKmOsNucOmLp6pB2yPSRhHFixA1p15Y00xqtwpkEL';
+
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusBox = document.getElementById('status');
+    const mainCopy = document.getElementById('main-copy');
+    let verifiedClientSecret = null;
+
+    function showStatus(message) {
+      statusBox.textContent = message;
+      statusBox.classList.add('show');
+    }
+
+    function setButtonReady() {
+      downloadBtn.disabled = false;
+      downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Your Roofing Blueprint';
+      mainCopy.textContent = 'Your Roofing Blueprint is ready. Click the button below to download your file without leaving this page.';
+    }
+
+    async function verifyStripePayment() {
+      const params = new URLSearchParams(window.location.search);
+      const clientSecret = params.get('payment_intent_client_secret');
+
+      // Stripe redirects here with payment_intent_client_secret after successful checkout.
+      if (!clientSecret) {
+        showStatus('Payment verification was not found in the URL. Make sure Stripe is redirecting to this success.html page after payment.');
+        downloadBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Payment Not Verified';
+        return;
+      }
+
+      try {
+        const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+        const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
+
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+          verifiedClientSecret = clientSecret;
+          setButtonReady();
+          return;
+        }
+
+        showStatus('Payment has not been marked successful yet. Current status: ' + (paymentIntent ? paymentIntent.status : 'unknown'));
+        downloadBtn.innerHTML = '<i class="fa-solid fa-clock"></i> Payment Pending';
+      } catch (error) {
+        showStatus('Could not verify payment. Check your Stripe publishable key and success page URL.');
+        downloadBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Verification Failed';
+      }
+    }
+
+    downloadBtn.addEventListener('click', async function () {
+      if (downloadBtn.disabled) return;
+
+      downloadBtn.disabled = true;
+      downloadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparing Download...';
+
+      try {
+        const response = await fetch('/.netlify/functions/get-download-link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientSecret: verifiedClientSecret })
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.url) throw new Error(data.error || 'No download URL returned.');
+
+        window.location.href = data.url;
+
+        setTimeout(() => {
+          downloadBtn.disabled = false;
+          downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Again';
+        }, 1500);
+      } catch (error) {
+        showStatus('Download failed. Make sure your Netlify get-download-link function and ROOFING_BLUEPRINT_DOWNLOAD_URL environment variable are set.');
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Try Download Again';
+      }
+    });
+
+    verifyStripePayment();
+  </script>
+</body>
+</html>
