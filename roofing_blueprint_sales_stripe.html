@@ -1093,7 +1093,14 @@ body.modal-open .page-shell { pointer-events: none; }
   let elements;
   let cardElement;
   let clientSecret;
+  let downloadToken;
   let cardElementMounted = false;
+
+  function createDownloadToken() {
+    const bytes = new Uint8Array(24);
+    window.crypto.getRandomValues(bytes);
+    return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  }
 
   function showMessage(message) {
     paymentMessage.textContent = message;
@@ -1114,6 +1121,9 @@ body.modal-open .page-shell { pointer-events: none; }
     }
 
     stripe = stripe || Stripe(STRIPE_PUBLISHABLE_KEY);
+    downloadToken = sessionStorage.getItem('roofingDownloadToken') || createDownloadToken();
+    sessionStorage.setItem('roofingDownloadToken', downloadToken);
+
     elements = elements || stripe.elements({
       fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap' }]
     });
@@ -1144,7 +1154,8 @@ body.modal-open .page-shell { pointer-events: none; }
       body: JSON.stringify({
         product: 'The Roofing Business Blueprint',
         amount: 9700,
-        currency: 'usd'
+        currency: 'usd',
+        downloadToken
       })
     });
 

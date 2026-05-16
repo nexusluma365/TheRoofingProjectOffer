@@ -131,6 +131,7 @@
     const statusBox = document.getElementById('status');
     const mainCopy = document.getElementById('main-copy');
     let verifiedClientSecret = null;
+    let verifiedDownloadToken = null;
 
     function showStatus(message) {
       statusBox.textContent = message;
@@ -146,10 +147,11 @@
     async function verifyStripePayment() {
       const params = new URLSearchParams(window.location.search);
       const clientSecret = params.get('payment_intent_client_secret');
+      const downloadToken = sessionStorage.getItem('roofingDownloadToken');
 
       // Stripe redirects here with payment_intent_client_secret after successful checkout.
-      if (!clientSecret) {
-        showStatus('Payment verification was not found in the URL. Make sure Stripe is redirecting to this success.html page after payment.');
+      if (!clientSecret || !downloadToken) {
+        showStatus('Payment verification was not found for this browser session. Open the download from the same browser tab used to complete checkout.');
         downloadBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Payment Not Verified';
         return;
       }
@@ -160,6 +162,7 @@
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
           verifiedClientSecret = clientSecret;
+          verifiedDownloadToken = downloadToken;
           setButtonReady();
           return;
         }
@@ -182,13 +185,17 @@
         const response = await fetch('/.netlify/functions/get-download-link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ clientSecret: verifiedClientSecret })
+          body: JSON.stringify({
+            clientSecret: verifiedClientSecret,
+            downloadToken: verifiedDownloadToken
+          })
         });
 
         const data = await response.json();
         if (!response.ok || !data.url) throw new Error(data.error || 'No download URL returned.');
 
         window.location.href = data.url;
+        sessionStorage.removeItem('roofingDownloadToken');
 
         setTimeout(() => {
           downloadBtn.disabled = false;

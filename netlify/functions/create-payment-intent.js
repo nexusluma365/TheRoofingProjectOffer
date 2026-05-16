@@ -28,7 +28,8 @@ exports.handler = async (event) => {
       description: 'The Roofing Business Blueprint',
       metadata: {
         product: body.product || 'The Roofing Business Blueprint',
-        source: 'roofing-blueprint-sales-page'
+        source: 'roofing-blueprint-sales-page',
+        downloadToken: body.downloadToken || ''
       }
     });
 
