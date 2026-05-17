@@ -20,18 +20,9 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const stripe = createStripe(process.env.STRIPE_SECRET_KEY);
-    const amount = Number.parseInt(process.env.STRIPE_AMOUNT_CENTS || '9700', 10);
-
-    if (!Number.isInteger(amount) || amount < 50) {
-      return {
-        statusCode: 500,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid STRIPE_AMOUNT_CENTS environment variable.' })
-      };
-    }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: 9700,
       currency: 'usd',
       payment_method_types: ['card'],
       description: 'The Roofing Business Blueprint',

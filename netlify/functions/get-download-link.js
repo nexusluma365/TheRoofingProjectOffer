@@ -51,12 +51,6 @@ exports.handler = async (event) => {
 
   try {
     const stripe = createStripe(process.env.STRIPE_SECRET_KEY);
-    const expectedAmount = Number.parseInt(process.env.STRIPE_AMOUNT_CENTS || "9700", 10);
-
-    if (!Number.isInteger(expectedAmount) || expectedAmount < 50) {
-      return errorResponse(500, "Invalid STRIPE_AMOUNT_CENTS environment variable.");
-    }
-
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (!paymentIntent || paymentIntent.status !== "succeeded") {
@@ -64,7 +58,7 @@ exports.handler = async (event) => {
     }
 
     if (
-      paymentIntent.amount !== expectedAmount ||
+      paymentIntent.amount !== 9700 ||
       paymentIntent.currency !== "usd" ||
       paymentIntent.metadata?.source !== "roofing-blueprint-sales-page" ||
       paymentIntent.metadata?.downloadToken !== downloadToken

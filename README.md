@@ -11,7 +11,6 @@
 2. Confirm the same publishable key is set in both `index.html` and `success.html`.
 3. In Netlify, add these environment variables:
    `STRIPE_SECRET_KEY=sk_test_or_sk_live_your_key_here`
-   `STRIPE_AMOUNT_CENTS=9700`
    `R2_ACCOUNT_ID=your_cloudflare_account_id`
    `R2_ACCESS_KEY_ID=your_r2_access_key_id`
    `R2_SECRET_ACCESS_KEY=your_r2_secret_access_key`
@@ -19,8 +18,6 @@
    `R2_FILE_KEY=your_download_file_key`
 4. Deploy the full folder to Netlify. Netlify serves `index.html` and uses the functions in `netlify/functions`.
 5. Test checkout with Stripe test mode first, then switch both the publishable key and `STRIPE_SECRET_KEY` to live keys when ready.
-
-For a private live checkout test at a lower charge, set `STRIPE_AMOUNT_CENTS` to the number of cents you want Stripe to charge, such as `100` for $1. Restore it to `9700` before sending real customers to the page.
 
 ## Deploy without the 404
 The publish root must be this folder:
